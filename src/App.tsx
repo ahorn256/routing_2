@@ -3,10 +3,16 @@ import './App.css';
 import List from './List';
 import { Book } from './Book';
 import IFetchError from './IFetchError';
+import Filter from './Filter';
 
 function App() {
   const [ books, setBooks ] = useState<Book[]>([]);
+  const [ filteredBooks, setFilteredBooks ] = useState<Book[]>([]);
   const [ error, setError ] = useState<IFetchError|null>(null);
+
+  useEffect(() => {
+    setFilteredBooks(books);
+  }, [books]);
 
   useEffect(() => {
     (async () => {
@@ -46,7 +52,8 @@ function App() {
           <p>{error.message}</p>
         </>
       )}
-      <List books={books}/>
+      <Filter books={books} setFilteredBooks={setFilteredBooks}/>
+      <List books={filteredBooks}/>
     </div>
   );
 }
