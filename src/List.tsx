@@ -1,6 +1,7 @@
 import React from "react";
 import { Book } from "./Book";
 import { Paper, Table, TableBody, TableCell, TableHead, TableRow } from "@mui/material";
+import { Star, StarBorder } from "@mui/icons-material";
 
 type Props = {
   books: Book[],
@@ -24,7 +25,7 @@ const List: React.FC<Props> = ({books}) => {
               <TableCell>{book.title}</TableCell>
               <TableCell>{book.author}</TableCell>
               <TableCell>{book.isbn}</TableCell>
-              <TableCell>{book.rating}</TableCell>
+              <TableCell>{Array(5).fill(0).map((item, index) => index < book.rating ? <Star key={index} /> : <StarBorder key={index} />)}</TableCell>
             </TableRow>
           ))}
         </TableBody>
