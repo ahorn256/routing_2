@@ -4,6 +4,7 @@ import List from './List';
 import { Book } from './Book';
 import IFetchError from './IFetchError';
 import Filter from './Filter';
+import { Grid } from '@mui/material';
 
 function App() {
   const [ books, setBooks ] = useState<Book[]>([]);
@@ -52,8 +53,18 @@ function App() {
           <p>{error.message}</p>
         </>
       )}
-      <Filter books={books} setFilteredBooks={setFilteredBooks}/>
-      <List books={filteredBooks}/>
+      <Grid container
+        justifyContent="center"
+        paddingLeft={2}
+        paddingRight={2}
+        rowSpacing={2}>
+        <Grid item width='100%'>
+          <Filter books={books} setFilteredBooks={setFilteredBooks}/>
+        </Grid>
+        <Grid item xs={12} md={10}>
+          <List books={filteredBooks}/>
+        </Grid>
+      </Grid>
     </div>
   );
 }
