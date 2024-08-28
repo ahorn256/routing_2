@@ -1,10 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Grid } from '@mui/material';
+import { Grid, TextField } from '@mui/material';
 import './App.css';
 import List from './List';
 import { Book } from './Book';
 import { convertToFetchError, IFetchError } from './FetchError';
-import Filter from './Filter';
 import ErrorMessage from './ErrorMessage';
 import ConfirmDialog from './ConfirmDialog';
 
@@ -97,7 +96,10 @@ function App() {
         paddingRight={2}
         rowSpacing={2}>
         <Grid item width='100%'>
-          <Filter filter={filter} setFilter={setFilter}/>
+          <TextField
+            label='filter books'
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)} />
         </Grid>
         <Grid item xs={12} md={10}>
           <List books={filteredBooks} onDelete={onDelete}/>
