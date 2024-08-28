@@ -2,21 +2,13 @@ import React, { useState } from "react";
 import { Book } from "./Book";
 
 type Props = {
-  books: Book[],
-  setFilteredBooks: (books:Book[]) => void,
+  filter: string,
+  setFilter: (filter:string) => void,
 };
 
-const Filter:React.FC<Props> = ({ books, setFilteredBooks }) => {
-  const [ filter, setFilter ] = useState('');
-
-  function handleFilter(value:string) {
-    setFilter(value);
-    setFilteredBooks(value ? books.filter(book => book.title.toLocaleLowerCase().includes(value.toLocaleLowerCase())) :
-      books);
-  }
-
+const Filter:React.FC<Props> = ({ filter, setFilter }) => {
   return (
-    <input type="text" value={filter} onChange={(e) => handleFilter(e.target.value)}/>
+    <input type="text" value={filter} onChange={(e) => setFilter(e.target.value)}/>
   );
 }
 

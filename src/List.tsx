@@ -1,10 +1,11 @@
 import React, { useCallback, useEffect, useState } from "react";
+import { IconButton, Paper, Table, TableBody, TableCell, TableHead, TableRow, TableSortLabel } from "@mui/material";
+import { Delete, Star, StarBorder } from "@mui/icons-material";
 import { Book } from "./Book";
-import { Paper, Table, TableBody, TableCell, TableHead, TableRow, TableSortLabel } from "@mui/material";
-import { Star, StarBorder } from "@mui/icons-material";
 
 type Props = {
   books: Book[],
+  onDelete: (book:Book) => void,
 };
 
 type SortIn = keyof Book;
@@ -22,7 +23,7 @@ const tableHead = {
   rating: 'Bewertung',
 };
 
-const List: React.FC<Props> = ({books}) => {
+const List: React.FC<Props> = ({books, onDelete}) => {
   const [ sort, setSort ] = useState<Sort>({
     orderBy: 'title',
     order: 'asc',
@@ -62,6 +63,7 @@ const List: React.FC<Props> = ({books}) => {
                   }} />
               </TableCell>
             ))}
+            <TableCell />
           </TableRow>
         </TableHead>
         <TableBody>
@@ -71,6 +73,11 @@ const List: React.FC<Props> = ({books}) => {
               <TableCell>{book.author}</TableCell>
               <TableCell>{book.isbn}</TableCell>
               <TableCell>{Array(5).fill(0).map((item, index) => index < book.rating ? <Star key={index} /> : <StarBorder key={index} />)}</TableCell>
+              <TableCell>
+                <IconButton aria-label="delete book" onClick={() => onDelete(book)}>
+                  <Delete />
+                </IconButton>
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
