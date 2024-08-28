@@ -1,3 +1,4 @@
+import { TextField } from "@mui/material";
 import React from "react";
 
 type Props = {
@@ -7,7 +8,10 @@ type Props = {
 
 const Filter:React.FC<Props> = ({ filter, setFilter }) => {
   return (
-    <input type="text" value={filter} onChange={(e) => setFilter(e.target.value)}/>
+    <TextField
+      label='filter books'
+      value={filter}
+      onChange={(e) => setFilter(e.target.value)} />
   );
 }
 
