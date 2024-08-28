@@ -6,16 +6,25 @@ import { Book } from './Book';
 import { convertToFetchError, IFetchError } from './FetchError';
 import Filter from './Filter';
 import ErrorMessage from './ErrorMessage';
+import ConfirmDialog from './ConfirmDialog';
+
+interface IDeleteDialog {
+  open: boolean,
+  book: Book|null,
+};
 
 function App() {
   const [ books, setBooks ] = useState<Book[]>([]);
   const [ filter, setFilter ] = useState('');
   const [ filteredBooks, setFilteredBooks ] = useState<Book[]>([]);
   const [ error, setError ] = useState<IFetchError|null>(null);
+  const [ deleteDialog, setDeleteDialog ] = useState<IDeleteDialog>({ open: false, book: null});
 
   const fetchBooks = useCallback(() =>
     (async () => {
       try {
+        setError(null);
+
         const url = process.env.REACT_APP_BOOKS_SERVER_URL;
 
         if(!url) throw new Error('REACT_APP_BOOKS_SERVER_URL undefined');
@@ -39,6 +48,8 @@ function App() {
   const deleteBook = useCallback((book: Book) =>
     (async () => {
       try {
+        setError(null);
+
         const url = process.env.REACT_APP_BOOKS_SERVER_URL;
 
         if(!url) throw new Error('REACT_APP_BOOKS_SERVER_URL undefined');
@@ -66,6 +77,17 @@ function App() {
   useEffect(() => { fetchBooks(); }, [fetchBooks]);
   useEffect(() => { filterBooks(); }, [filterBooks]);
 
+  function onDelete(book:Book) {
+    setDeleteDialog({ open: true, book });
+  }
+
+  function onConfirmDelete(confirm: boolean) {
+    if(confirm && deleteDialog.book) {
+      deleteBook(deleteDialog.book);
+    }
+    setDeleteDialog({ open: false, book: null});
+  }
+
   return (
     <div className="App">
       {error && <ErrorMessage error={error} />}
@@ -78,9 +100,14 @@ function App() {
           <Filter filter={filter} setFilter={setFilter}/>
         </Grid>
         <Grid item xs={12} md={10}>
-          <List books={filteredBooks} onDelete={deleteBook}/>
+          <List books={filteredBooks} onDelete={onDelete}/>
         </Grid>
       </Grid>
+      <ConfirmDialog
+        title='Confirm deletion'
+        text={`Do you want remove "${deleteDialog.book?.title}"?`}
+        open={deleteDialog.open}
+        onConfirm={onConfirmDelete} />
     </div>
   );
 }
