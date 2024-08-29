@@ -1,18 +1,19 @@
 import { Close } from '@mui/icons-material';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, IconButton, TextField } from '@mui/material';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup'
-import { InputBook } from './Book';
+import { Book, InputBook } from './Book';
 import formValidationSchema from './formValidationSchema';
 
 type Props = {
   open: boolean,
   onSave: (book:InputBook) => void,
   onClose: () => void,
+  book?: Book|null,
 };
 
-const FormDialog:React.FC<Props> = ({ open, onSave, onClose }) => {
+const FormDialog:React.FC<Props> = ({ open, onSave, onClose, book = null }) => {
   const {
     register,
     handleSubmit,
@@ -22,11 +23,23 @@ const FormDialog:React.FC<Props> = ({ open, onSave, onClose }) => {
     resolver: yupResolver(formValidationSchema),
   });
 
+  useEffect(() => {
+    if(book) {
+      reset(book);
+    } else {
+      reset({})
+    }
+  }, [ book, reset ]);
+
   return (
     <Dialog
       open={open}
-      onClose={onClose}>
-      <DialogTitle>Dialog Title</DialogTitle>
+      onClose={onClose}
+      aria-labelledby='form-dialog-title'
+      aria-describedby='form-dialog-description'>
+      <DialogTitle id='form-dialog-title'>
+        { book ? 'Buch bearbeiten' : 'Neues Buch anlegen' }
+      </DialogTitle>
 
       <IconButton
         onClick={onClose}
@@ -39,7 +52,7 @@ const FormDialog:React.FC<Props> = ({ open, onSave, onClose }) => {
       </IconButton>
 
       <form onSubmit={handleSubmit(onSave)}>
-        <DialogContent>
+        <DialogContent id='form-dialog-description'>
           <Grid container direction={'column'} rowSpacing={1}>
             <Grid item>
               <TextField label='Titel' error={!!errors.title} {...register('title')}/>
