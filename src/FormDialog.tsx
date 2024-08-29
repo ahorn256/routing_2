@@ -4,7 +4,7 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup'
 import { InputBook } from './Book';
-import addFormValidationSchema from './addFormValidationSchema';
+import formValidationSchema from './formValidationSchema';
 
 type Props = {
   open: boolean,
@@ -12,14 +12,14 @@ type Props = {
   onClose: () => void,
 };
 
-const AddForm:React.FC<Props> = ({ open, onSave, onClose }) => {
+const FormDialog:React.FC<Props> = ({ open, onSave, onClose }) => {
   const {
     register,
     handleSubmit,
     reset,
     formState: { errors }
   } = useForm<InputBook>({
-    resolver: yupResolver(addFormValidationSchema),
+    resolver: yupResolver(formValidationSchema),
   });
 
   return (
@@ -65,4 +65,4 @@ const AddForm:React.FC<Props> = ({ open, onSave, onClose }) => {
   );
 }
 
-export default AddForm;
+export default FormDialog;

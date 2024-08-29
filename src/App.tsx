@@ -6,7 +6,7 @@ import { Book, InputBook } from './Book';
 import { convertToFetchError, IFetchError } from './FetchError';
 import ErrorMessage from './ErrorMessage';
 import ConfirmDialog from './ConfirmDialog';
-import AddForm from './AddForm';
+import FormDialog from './FormDialog';
 
 interface IDeleteDialog {
   open: boolean,
@@ -19,7 +19,7 @@ function App() {
   const [ filteredBooks, setFilteredBooks ] = useState<Book[]>([]);
   const [ error, setError ] = useState<IFetchError|null>(null);
   const [ deleteDialog, setDeleteDialog ] = useState<IDeleteDialog>({ open: false, book: null});
-  const [ addFormDialog, setAddFormDialog ] = useState<boolean>(true);
+  const [ formDialog, setFormDialog ] = useState<boolean>(true);
 
   const fetchBooks = useCallback(() =>
     (async () => {
@@ -115,7 +115,7 @@ function App() {
 
   function onSave(book: InputBook) {
     console.log('TODO: save book => ', book);
-    setAddFormDialog(false);
+    setFormDialog(false);
   }
 
   return (
@@ -141,7 +141,7 @@ function App() {
         text={`Do you want remove "${deleteDialog.book?.title}"?`}
         open={deleteDialog.open}
         onConfirm={onConfirmDelete} />
-      <AddForm open={addFormDialog} onSave={onSave} onClose={() => setAddFormDialog(false)}/>
+      <FormDialog open={formDialog} onSave={onSave} onClose={() => setFormDialog(false)}/>
     </div>
   );
 }
