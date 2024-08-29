@@ -2,10 +2,11 @@ import { useCallback, useEffect, useState } from 'react';
 import { Grid, TextField } from '@mui/material';
 import './App.css';
 import List from './List';
-import { Book } from './Book';
+import { Book, InputBook } from './Book';
 import { convertToFetchError, IFetchError } from './FetchError';
 import ErrorMessage from './ErrorMessage';
 import ConfirmDialog from './ConfirmDialog';
+import AddForm from './AddForm';
 
 interface IDeleteDialog {
   open: boolean,
@@ -18,6 +19,7 @@ function App() {
   const [ filteredBooks, setFilteredBooks ] = useState<Book[]>([]);
   const [ error, setError ] = useState<IFetchError|null>(null);
   const [ deleteDialog, setDeleteDialog ] = useState<IDeleteDialog>({ open: false, book: null});
+  const [ addFormDialog, setAddFormDialog ] = useState<boolean>(true);
 
   const fetchBooks = useCallback(() =>
     (async () => {
@@ -111,6 +113,11 @@ function App() {
     setDeleteDialog({ open: false, book: null});
   }
 
+  function onSave(book: InputBook) {
+    console.log('TODO: save book => ', book);
+    setAddFormDialog(false);
+  }
+
   return (
     <div className="App">
       {error && <ErrorMessage error={error} />}
@@ -134,6 +141,7 @@ function App() {
         text={`Do you want remove "${deleteDialog.book?.title}"?`}
         open={deleteDialog.open}
         onConfirm={onConfirmDelete} />
+      <AddForm open={addFormDialog} onSave={onSave} onClose={() => setAddFormDialog(false)}/>
     </div>
   );
 }
