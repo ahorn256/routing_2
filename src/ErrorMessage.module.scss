@@ -1,6 +1,8 @@
+@import './colors.scss';
+
 .error {
   margin: 1em 0;
-  color: rgb(255, 50, 100);
+  color: $color_error;
 }
 
 .title {
