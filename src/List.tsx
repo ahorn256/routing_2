@@ -1,11 +1,12 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { IconButton, Paper, Table, TableBody, TableCell, TableHead, TableRow, TableSortLabel } from "@mui/material";
-import { Delete, Star, StarBorder } from "@mui/icons-material";
+import { Delete, Edit, Star, StarBorder } from "@mui/icons-material";
 import { Book } from "./Book";
 
 type Props = {
   books: Book[],
   onDelete: (book:Book) => void,
+  onEdit: (book:Book) => void,
 };
 
 type SortIn = keyof Book;
@@ -23,7 +24,7 @@ const tableHead = {
   rating: 'Bewertung',
 };
 
-const List: React.FC<Props> = ({books, onDelete}) => {
+const List: React.FC<Props> = ({books, onDelete, onEdit}) => {
   const [ sort, setSort ] = useState<Sort>({
     orderBy: 'title',
     order: 'asc',
@@ -74,6 +75,9 @@ const List: React.FC<Props> = ({books, onDelete}) => {
               <TableCell>{book.isbn}</TableCell>
               <TableCell>{Array(5).fill(0).map((item, index) => index < book.rating ? <Star key={index} /> : <StarBorder key={index} />)}</TableCell>
               <TableCell>
+                <IconButton aria-label="edit book" onClick={() => onEdit(book)}>
+                  <Edit />
+                </IconButton>
                 <IconButton aria-label="delete book" onClick={() => onDelete(book)}>
                   <Delete />
                 </IconButton>

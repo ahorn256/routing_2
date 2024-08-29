@@ -27,9 +27,9 @@ const FormDialog:React.FC<Props> = ({ open, onSave, onClose, book = null }) => {
     if(book) {
       reset(book);
     } else {
-      reset({})
+      reset({});
     }
-  }, [ book, reset ]);
+  }, [ open, book, reset ]);
 
   return (
     <Dialog
@@ -53,17 +53,17 @@ const FormDialog:React.FC<Props> = ({ open, onSave, onClose, book = null }) => {
 
       <form onSubmit={handleSubmit(onSave)}>
         <DialogContent id='form-dialog-description'>
-          <Grid container direction={'column'} rowSpacing={1}>
+          <Grid container direction={'column'} rowSpacing={1} display='flex'>
             <Grid item>
-              <TextField label='Titel' error={!!errors.title} {...register('title')}/>
+              <TextField fullWidth={true} label='Titel' error={!!errors.title} {...register('title')}/>
               { errors.title && <div className='error'>{errors.title.message}</div> }
             </Grid>
             <Grid item>
-              <TextField label='Author' error={!!errors.author} {...register('author')}/>
+              <TextField fullWidth={true} label='Author' error={!!errors.author} {...register('author')}/>
               { errors.author && <div className='error'>{errors.author.message}</div> }
             </Grid>
             <Grid item>
-              <TextField label='ISBN' error={!!errors.isbn} {...register('isbn')}/>
+              <TextField fullWidth={true} label='ISBN' error={!!errors.isbn} {...register('isbn')}/>
               { errors.isbn && <div className='error'>{errors.isbn.message}</div> }
             </Grid>
           </Grid>
