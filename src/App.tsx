@@ -68,6 +68,30 @@ function App() {
     }
   )(), []);
 
+  const addBook = useCallback((book:Book) => {
+    (async () => {
+      try {
+        const url = process.env.REACT_APP_BOOKS_SERVER_URL;
+        if(!url) throw new Error('REACT_APP_BOOKS_SERVER_URL undefined');
+
+        const response = await fetch(`${url}/${book.id}`, {
+          method: 'POST',
+          body: JSON.stringify(book),
+          headers: { 'content-type': 'application/json' },
+        });
+        
+        if(response.ok) {
+          const data = await response.json();
+          setBooks((curBooks) => [...curBooks, data]);
+        } else {
+          throw new Error(`Couldn't add the book "${book.title}"`);
+        }
+      } catch(error) {
+        setError(convertToFetchError(error));
+      }
+    })();
+  }, []);
+
   const filterBooks = useCallback(() => {
     setFilteredBooks(filter ? books.filter(book => book.title.toLocaleLowerCase().includes(filter.toLocaleLowerCase())) :
       books);
