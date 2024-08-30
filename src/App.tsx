@@ -14,13 +14,23 @@ interface IDialog {
   book: Book|null,
 };
 
-function convertObjectToBook(obj:Object) {
-  return {
-    title: 'title' in obj ? String(obj.title) : '',
-    author: 'author' in obj ? String(obj.author) : '',
-    isbn: 'isbn' in obj ? String(obj.isbn) : '',
-    rating: 'rating' in obj ? parseInt(String(obj.rating)) : 0,
-    id: 'id' in obj ? String(obj.id) : '0',
+function convertToBook(obj:unknown) {
+  if(obj !== null && typeof obj === 'object') {
+    return {
+      title: 'title' in obj ? String(obj.title) : '',
+      author: 'author' in obj ? String(obj.author) : '',
+      isbn: 'isbn' in obj ? String(obj.isbn) : '',
+      rating: 'rating' in obj ? parseInt(String(obj.rating)) : 0,
+      id: 'id' in obj ? String(obj.id) : '',
+    }
+  } else {
+    return {
+      title: '',
+      author: '',
+      isbn: '',
+      rating: 0,
+      id: '',
+    }
   }
 }
 
@@ -44,8 +54,8 @@ function App() {
         const response = await fetch(url);
 
         if(response.ok) {
-          const data:Object[] = await response.json();
-          setBooks(data.map(convertObjectToBook));
+          const data = await response.json();
+          setBooks(data.map(convertToBook));
         } else {
           throw new Error(`Couldn't fetch books`);
         }
@@ -94,7 +104,7 @@ function App() {
         
         if(response.ok) {
           const data = await response.json();
-          setBooks((curBooks) => [...curBooks, data]);
+          setBooks((curBooks) => [...curBooks, convertToBook(data)]);
         } else {
           throw new Error(`Couldn't add the book "${book.title}"`);
         }
@@ -126,7 +136,7 @@ function App() {
           const data:Object[] = await response.json();
 
           if('id' in data) {
-            setBooks(curBooks => curBooks.map(b => b.id === data.id ? convertObjectToBook(data)  : b))
+            setBooks(curBooks => curBooks.map(b => b.id === data.id ? convertToBook(data)  : b))
           } else {
             throw new Error(msgEditFailed);
           }
