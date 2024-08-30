@@ -79,6 +79,8 @@ function App() {
   const addBook = useCallback((book:InputBook) => {
     (async () => {
       try {
+        setError(null);
+
         const url = process.env.REACT_APP_BOOKS_SERVER_URL;
         if(!url) throw new Error('REACT_APP_BOOKS_SERVER_URL undefined');
 
