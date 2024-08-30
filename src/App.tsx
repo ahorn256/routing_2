@@ -14,6 +14,16 @@ interface IDialog {
   book: Book|null,
 };
 
+function convertObjectToBook(obj:Object) {
+  return {
+    title: 'title' in obj ? String(obj.title) : '',
+    author: 'author' in obj ? String(obj.author) : '',
+    isbn: 'isbn' in obj ? String(obj.isbn) : '',
+    rating: 'rating' in obj ? parseInt(String(obj.rating)) : 0,
+    id: 'id' in obj ? String(obj.id) : '0',
+  }
+}
+
 function App() {
   const [ books, setBooks ] = useState<Book[]>([]);
   const [ filter, setFilter ] = useState('');
@@ -34,16 +44,8 @@ function App() {
         const response = await fetch(url);
 
         if(response.ok) {
-        const data:Object[] = await response.json();
-        setBooks(data.map(item => {
-          return {
-            title: 'title' in item ? String(item.title) : '',
-            author: 'author' in item ? String(item.author) : '',
-            isbn: 'isbn' in item ? String(item.isbn) : '',
-            rating: 'rating' in item ? parseInt(String(item.rating)) : 0,
-            id: 'id' in item ? String(item.id) : '0',
-          }
-        }));
+          const data:Object[] = await response.json();
+          setBooks(data.map(convertObjectToBook));
         } else {
           throw new Error(`Couldn't fetch books`);
         }
@@ -102,6 +104,41 @@ function App() {
     })();
   }, []);
 
+  const updateBook = useCallback((book: InputBook) => {
+    (async () => {
+      try {
+        setError(null);
+
+        if(!('id' in book)) throw new Error(`Couldn't update a book. "id" is missing.`);
+
+        const msgEditFailed = `Couldn't edit a book with the id="${book.id}"`;
+        const url = process.env.REACT_APP_BOOKS_SERVER_URL;
+
+        if(!url) throw new Error('REACT_APP_BOOKS_SERVER_URL is not defined');
+
+        const response = await fetch(`${url}/${book.id}`, {
+          method: 'PUT',
+          body: JSON.stringify(book),
+          headers: { 'content-type': 'application/json' },
+        });
+
+        if(response.ok) {
+          const data:Object[] = await response.json();
+
+          if('id' in data) {
+            setBooks(curBooks => curBooks.map(b => b.id === data.id ? convertObjectToBook(data)  : b))
+          } else {
+            throw new Error(msgEditFailed);
+          }
+        } else {
+          throw new Error(msgEditFailed);
+        }
+      } catch(error) {
+        setError(convertToFetchError(error));
+      }
+    })();
+  }, []);
+
   const filterBooks = useCallback(() => {
     setFilteredBooks(filter ? books.filter(book => book.title.toLocaleLowerCase().includes(filter.toLocaleLowerCase())) :
       books);
@@ -119,7 +156,7 @@ function App() {
 
   function onSave(book: InputBook) {
     if('id' in book) {
-      console.log('TODO: edit book: ', book);
+      updateBook(book);
     } else {
       addBook(book);
     }
