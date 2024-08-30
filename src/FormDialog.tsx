@@ -27,7 +27,11 @@ const FormDialog:React.FC<Props> = ({ open, onSave, onClose, book = null }) => {
     if(book) {
       reset(book);
     } else {
-      reset({});
+      reset({
+        title: '',
+        author: '',
+        isbn: '',
+      });
     }
   }, [ open, book, reset ]);
 
