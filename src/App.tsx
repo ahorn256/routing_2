@@ -32,6 +32,8 @@ function App() {
         if(!url) throw new Error('REACT_APP_BOOKS_SERVER_URL undefined');
         
         const response = await fetch(url);
+
+        if(response.ok) {
         const data:Object[] = await response.json();
         setBooks(data.map(item => {
           return {
@@ -42,6 +44,9 @@ function App() {
             id: 'id' in item ? String(item.id) : '0',
           }
         }));
+        } else {
+          throw new Error(`Couldn't fetch books`);
+        }
       } catch(error) {
         setError(convertToFetchError(error));
       }
