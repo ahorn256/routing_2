@@ -4,6 +4,7 @@ import Books from './Books';
 import Home from './Home';
 import Nav from './Nav';
 import NotFound from './NotFound';
+import Login from './Login';
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
         <Routes>
           <Route path='/books' element={<Books />}/>
           <Route path='/' element={<Home />}/>
+          <Route path='/login' element={<Login />} />
           <Route path='*' element={<NotFound />}/>
         </Routes>
       </div>

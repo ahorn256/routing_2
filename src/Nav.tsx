@@ -1,5 +1,5 @@
-import { Menu as MenuIcon } from "@mui/icons-material";
-import { AppBar, IconButton, Menu, MenuItem, Toolbar } from "@mui/material";
+import * as Icon from "@mui/icons-material";
+import { AppBar, Box, IconButton, Menu, MenuItem, Toolbar } from "@mui/material";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -26,8 +26,10 @@ function Nav() {
           aria-controls="navigation-menu"
           aria-haspopup="true"
           aria-expanded={open}>
-          <MenuIcon />
+          <Icon.Menu />
         </IconButton>
+        <Box sx={{flexGrow: 1}} />
+        <Link to="/login" style={{color: 'inherit'}}><Icon.Login /></Link>
         <Menu
           id="navigation-menu"
           open={open}
