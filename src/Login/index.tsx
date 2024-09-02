@@ -3,24 +3,21 @@ import { Button, Container, Grid, Paper, TextField } from "@mui/material";
 import { useForm } from "react-hook-form";
 import validationSchema from "./validationSchema";
 import styles from './index.module.scss';
+import React from "react";
+import { ILogin } from "./Login";
 
-type TLogin = {
-  user: string,
-  password: string,
-};
+type Props = {
+  onLogin: (login:ILogin) => void,
+}
 
-function Login() {
+const Login:React.FC<Props> = ({onLogin}) => {
   const {
     register,
     handleSubmit,
     formState: {errors}
-  } = useForm<TLogin>({
+  } = useForm<ILogin>({
     resolver: yupResolver(validationSchema),
   });
-
-  function onSubmit(login: TLogin) {
-    console.log(login);
-  }
 
   return (
     <Container
@@ -29,7 +26,7 @@ function Login() {
       sx={{ marginTop: 5 }}>
       <Paper
         sx={{padding: 3}}>
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={handleSubmit(onLogin)}>
           <Grid
             container
             direction="column"

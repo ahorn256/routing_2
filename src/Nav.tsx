@@ -3,12 +3,17 @@ import { AppBar, Box, IconButton, Menu, MenuItem, Toolbar } from "@mui/material"
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
-function Nav() {
+type Props = {
+  isLoggedIn: boolean,
+  onLogout: () => void,
+};
+
+const Nav:React.FC<Props> = ({isLoggedIn, onLogout}) => {
   const [ anchorEl, setAnchorEl ] = useState<HTMLElement|null>(null);
   const open = Boolean(anchorEl);
 
   function handleMenuOpen(event: React.MouseEvent<HTMLButtonElement>) {
-    setAnchorEl(event.currentTarget);
+    isLoggedIn && setAnchorEl(event.currentTarget);
   }
 
   function handleMenuClose() {
@@ -29,7 +34,8 @@ function Nav() {
           <Icon.Menu />
         </IconButton>
         <Box sx={{flexGrow: 1}} />
-        <Link to="/login" style={{color: 'inherit'}}><Icon.Login /></Link>
+        { !isLoggedIn && <Link to="/login" style={{color: 'inherit'}}><Icon.Login /></Link> }
+        { isLoggedIn && <IconButton color="inherit" onClick={onLogout}><Icon.Logout /></IconButton> }
         <Menu
           id="navigation-menu"
           open={open}
