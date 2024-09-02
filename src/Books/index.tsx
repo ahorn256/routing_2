@@ -181,7 +181,8 @@ function Books() {
         alignItems="center"
         paddingLeft={2}
         paddingRight={2}
-        rowSpacing={2}>
+        rowSpacing={2}
+        data-testid='books-grid'>
         <Grid item width='100%'>
           <TextField
             label='filter books'
