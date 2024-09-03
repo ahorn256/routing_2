@@ -2,11 +2,11 @@ import { useCallback, useEffect, useState } from 'react';
 import { Fab, Grid, TextField } from '@mui/material';
 import { Add } from '@mui/icons-material';
 import List from './List';
-import { Book, InputBook } from './Book';
+import { Book } from './Book';
 import { convertToFetchError, IFetchError } from '../FetchError';
 import ErrorMessage from '../ErrorMessage';
 import ConfirmDialog from '../ConfirmDialog';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 
 interface IDialog {
   open: boolean,
@@ -40,6 +40,7 @@ function Books() {
   const [ error, setError ] = useState<IFetchError|null>(null);
   const [ deleteDialog, setDeleteDialog ] = useState<IDialog>({ open: false, book: null});
   const navigate = useNavigate();
+  const location = useLocation();
 
   const fetchBooks = useCallback(() =>
     (async () => {
@@ -87,73 +88,12 @@ function Books() {
     }
   )(), []);
 
-  const addBook = useCallback((book:InputBook) => {
-    (async () => {
-      try {
-        setError(null);
-
-        const url = process.env.REACT_APP_BOOKS_SERVER_URL;
-        if(!url) throw new Error('REACT_APP_BOOKS_SERVER_URL undefined');
-
-        const response = await fetch(url, {
-          method: 'POST',
-          body: JSON.stringify(book),
-          headers: { 'content-type': 'application/json' },
-        });
-        
-        if(response.ok) {
-          const data = await response.json();
-          setBooks((curBooks) => [...curBooks, convertToBook(data)]);
-        } else {
-          throw new Error(`Couldn't add the book "${book.title}"`);
-        }
-      } catch(error) {
-        setError(convertToFetchError(error));
-      }
-    })();
-  }, []);
-
-  const updateBook = useCallback((book: InputBook) => {
-    (async () => {
-      try {
-        setError(null);
-
-        if(!('id' in book)) throw new Error(`Couldn't update a book. "id" is missing.`);
-
-        const msgEditFailed = `Couldn't edit a book with the id="${book.id}"`;
-        const url = process.env.REACT_APP_BOOKS_SERVER_URL;
-
-        if(!url) throw new Error('REACT_APP_BOOKS_SERVER_URL is not defined');
-
-        const response = await fetch(`${url}/${book.id}`, {
-          method: 'PUT',
-          body: JSON.stringify(book),
-          headers: { 'content-type': 'application/json' },
-        });
-
-        if(response.ok) {
-          const data:Object[] = await response.json();
-
-          if('id' in data) {
-            setBooks(curBooks => curBooks.map(b => b.id === data.id ? convertToBook(data)  : b))
-          } else {
-            throw new Error(msgEditFailed);
-          }
-        } else {
-          throw new Error(msgEditFailed);
-        }
-      } catch(error) {
-        setError(convertToFetchError(error));
-      }
-    })();
-  }, []);
-
   const filterBooks = useCallback(() => {
     setFilteredBooks(filter ? books.filter(book => book.title.toLocaleLowerCase().includes(filter.toLocaleLowerCase())) :
       books);
   }, [filter, books]);
 
-  useEffect(() => { fetchBooks(); }, [fetchBooks]);
+  useEffect(() => { fetchBooks(); }, [location, fetchBooks]);
   useEffect(() => { filterBooks(); }, [filterBooks]);
 
   function onConfirmDelete(confirm: boolean) {
@@ -164,7 +104,7 @@ function Books() {
   }
 
   function onAdd() {
-    console.log('TODO: onAdd in Books');
+    navigate(`/books/new`);
   }
 
   function onEdit(book: Book) {

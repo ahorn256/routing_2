@@ -47,17 +47,79 @@ function FormDialog() {
     })();
   }, [reset]);
 
+  const updateBook = useCallback((book: InputBook) => {
+    (async () => {
+      try {
+        setFetchError(null);
+
+        if(!('id' in book)) throw new Error(`Couldn't update a book. "id" is missing.`);
+
+        const msgEditFailed = `Couldn't edit a book with the id="${book.id}"`;
+        const url = process.env.REACT_APP_BOOKS_SERVER_URL;
+
+        if(!url) throw new Error('REACT_APP_BOOKS_SERVER_URL is not defined');
+
+        const response = await fetch(`${url}/${book.id}`, {
+          method: 'PUT',
+          body: JSON.stringify(book),
+          headers: { 'content-type': 'application/json' },
+        });
+
+        if(response.ok) {
+          onClose();
+        } else {
+          throw new Error(msgEditFailed);
+        }
+      } catch(error) {
+        setFetchError(convertToFetchError(error));
+      }
+    })();
+  }, []);
+
+  const addBook = useCallback((book:InputBook) => {
+    (async () => {
+      try {
+        setFetchError(null);
+
+        const url = process.env.REACT_APP_BOOKS_SERVER_URL;
+        if(!url) throw new Error('REACT_APP_BOOKS_SERVER_URL undefined');
+
+        const response = await fetch(url, {
+          method: 'POST',
+          body: JSON.stringify(book),
+          headers: { 'content-type': 'application/json' },
+        });
+        
+        if(response.ok) {
+          onClose();
+        } else {
+          throw new Error(`Couldn't add the book "${book.title}"`);
+        }
+      } catch(error) {
+        setFetchError(convertToFetchError(error));
+      }
+    })();
+  }, []);
+
   useEffect(() => {
-    fetchBook(id);
+    if(id) {
+      fetchBook(id);
+    } else {
+      setOpen(true);
+    }
   }, [id, fetchBook]);
 
   function onClose() {
+    setOpen(false);
     navigate('/books');
   }
 
-  function onSave() {
-    navigate('/books');
-    console.log('TODO: onSave');
+  function onSave(book: InputBook) {
+    if('id' in book) {
+      updateBook(book);
+    } else {
+      addBook(book);
+    }
   }
 
   return (
