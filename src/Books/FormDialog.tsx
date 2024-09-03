@@ -1,19 +1,14 @@
 import { Close } from '@mui/icons-material';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, IconButton, TextField } from '@mui/material';
-import React, { useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup'
-import { Book, InputBook } from './Book';
+import { InputBook } from './Book';
 import formValidationSchema from './formValidationSchema';
+import { useNavigate, useParams } from 'react-router-dom';
+import { convertToFetchError, IFetchError } from '../FetchError';
 
-type Props = {
-  open: boolean,
-  onSave: (book:InputBook) => void,
-  onClose: () => void,
-  book?: Book|null,
-};
-
-const FormDialog:React.FC<Props> = ({ open, onSave, onClose, book = null }) => {
+function FormDialog() {
   const {
     register,
     handleSubmit,
@@ -22,18 +17,48 @@ const FormDialog:React.FC<Props> = ({ open, onSave, onClose, book = null }) => {
   } = useForm<InputBook>({
     resolver: yupResolver(formValidationSchema),
   });
+  const [ fetchError, setFetchError ] = useState<IFetchError|null>(null);
+  const { id } = useParams<{id:string}>();
+  const [ open, setOpen ] = useState(false);
+  const navigate = useNavigate();
+
+  const fetchBook = useCallback((id: string|undefined) => {
+    (async () => {
+      try {
+        setFetchError(null);
+
+        const url = process.env.REACT_APP_BOOKS_SERVER_URL;
+
+        if(!url) throw new Error('REACT_APP_BOOKS_SERVER_URL undefined');
+        
+        const response = await fetch(`${url}/${id}`);
+
+        if(response.ok) {
+          const data = await response.json();
+          reset(data);
+        } else {
+          throw new Error(`Couldn't fetch the book with the "id:${id}"`);
+        }
+      } catch(error) {
+        setFetchError(convertToFetchError(error));
+      } finally {
+        setOpen(true);
+      }
+    })();
+  }, [reset]);
 
   useEffect(() => {
-    if(book) {
-      reset(book);
-    } else {
-      reset({
-        title: '',
-        author: '',
-        isbn: '',
-      });
-    }
-  }, [ open, book, reset ]);
+    fetchBook(id);
+  }, [id, fetchBook]);
+
+  function onClose() {
+    navigate('/books');
+  }
+
+  function onSave() {
+    navigate('/books');
+    console.log('TODO: onSave');
+  }
 
   return (
     <Dialog
@@ -42,7 +67,7 @@ const FormDialog:React.FC<Props> = ({ open, onSave, onClose, book = null }) => {
       aria-labelledby='form-dialog-title'
       aria-describedby='form-dialog-description'>
       <DialogTitle id='form-dialog-title'>
-        { book ? 'Buch bearbeiten' : 'Neues Buch anlegen' }
+        {id ? 'Buch bearbeiten' : 'Neues Buch anlegen'}
       </DialogTitle>
 
       <IconButton
@@ -57,6 +82,7 @@ const FormDialog:React.FC<Props> = ({ open, onSave, onClose, book = null }) => {
 
       <form onSubmit={handleSubmit(onSave)}>
         <DialogContent id='form-dialog-description'>
+          {fetchError && <div className='error'>{fetchError.message}</div>}
           <Grid container direction={'column'} rowSpacing={1} display='flex'>
             <Grid item>
               <TextField fullWidth={true} label='Titel' error={!!errors.title} {...register('title')}/>

@@ -6,7 +6,7 @@ import { Book, InputBook } from './Book';
 import { convertToFetchError, IFetchError } from '../FetchError';
 import ErrorMessage from '../ErrorMessage';
 import ConfirmDialog from '../ConfirmDialog';
-import FormDialog from './FormDialog';
+import { Outlet, useNavigate } from 'react-router-dom';
 
 interface IDialog {
   open: boolean,
@@ -39,7 +39,7 @@ function Books() {
   const [ filteredBooks, setFilteredBooks ] = useState<Book[]>([]);
   const [ error, setError ] = useState<IFetchError|null>(null);
   const [ deleteDialog, setDeleteDialog ] = useState<IDialog>({ open: false, book: null});
-  const [ formDialog, setFormDialog ] = useState<IDialog>({ open: false, book: null});
+  const navigate = useNavigate();
 
   const fetchBooks = useCallback(() =>
     (async () => {
@@ -163,14 +163,12 @@ function Books() {
     setDeleteDialog({ open: false, book: null});
   }
 
-  function onSave(book: InputBook) {
-    if('id' in book) {
-      updateBook(book);
-    } else {
-      addBook(book);
-    }
+  function onAdd() {
+    console.log('TODO: onAdd in Books');
+  }
 
-    setFormDialog({ open: false, book: null });
+  function onEdit(book: Book) {
+    navigate(`/books/edit/${book.id}`);
   }
 
   return (
@@ -193,12 +191,12 @@ function Books() {
           <List
             books={filteredBooks}
             onDelete={(book) => setDeleteDialog({ open: true, book })}
-            onEdit={(book) => setFormDialog({ open: true, book})}/>
+            onEdit={(book) => onEdit(book)}/>
         </Grid>
         <Fab
           color='primary'
           sx={{ transform:'translateY(-50%)' }}
-          onClick={() => setFormDialog({ open: true, book: null})}>
+          onClick={onAdd}>
           <Add />
         </Fab>
       </Grid>
@@ -209,11 +207,7 @@ function Books() {
         open={deleteDialog.open}
         onConfirm={onConfirmDelete} />
 
-      <FormDialog
-        open={formDialog.open}
-        book={formDialog.book}
-        onSave={onSave}
-        onClose={() => setFormDialog({ open: false, book: null })}/>
+      <Outlet />
     </>
   );
 }
