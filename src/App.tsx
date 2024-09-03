@@ -5,6 +5,7 @@ import Home from './Home';
 import Nav from './Nav';
 import NotFound from './NotFound';
 import FormDialog from './Books/FormDialog';
+import DeletionDialog from './Books/DeletionDialog';
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <Routes>
           <Route path='/books' element={<Books />}>
             <Route path='edit/:id' element={<FormDialog />} />
+            <Route path='delete/:id' element={<DeletionDialog />} />
             <Route path='new/' element={<FormDialog />} />
           </Route>
           <Route path='/' element={<Home />}/>

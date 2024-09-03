@@ -5,13 +5,7 @@ import List from './List';
 import { Book } from './Book';
 import { convertToFetchError, IFetchError } from '../FetchError';
 import ErrorMessage from '../ErrorMessage';
-import ConfirmDialog from '../ConfirmDialog';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
-
-interface IDialog {
-  open: boolean,
-  book: Book|null,
-};
 
 function convertToBook(obj:unknown) {
   if(obj !== null && typeof obj === 'object') {
@@ -38,7 +32,6 @@ function Books() {
   const [ filter, setFilter ] = useState('');
   const [ filteredBooks, setFilteredBooks ] = useState<Book[]>([]);
   const [ error, setError ] = useState<IFetchError|null>(null);
-  const [ deleteDialog, setDeleteDialog ] = useState<IDialog>({ open: false, book: null});
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -64,30 +57,6 @@ function Books() {
       }
     })(), []);
 
-  const deleteBook = useCallback((book: Book) =>
-    (async () => {
-      try {
-        setError(null);
-
-        const url = process.env.REACT_APP_BOOKS_SERVER_URL;
-
-        if(!url) throw new Error('REACT_APP_BOOKS_SERVER_URL undefined');
-
-        const response = await fetch(`${url}/${book.id}`, {
-          method: 'DELETE',
-        });
-
-        if(response.ok) {
-          setBooks(curBooks => curBooks.filter(b => b.id !== book.id));
-        } else {
-          throw new Error(`Couldn't delete the book with the title "${book.title}".`);
-        }
-      } catch(error) {
-        setError(convertToFetchError(error));
-      }
-    }
-  )(), []);
-
   const filterBooks = useCallback(() => {
     setFilteredBooks(filter ? books.filter(book => book.title.toLocaleLowerCase().includes(filter.toLocaleLowerCase())) :
       books);
@@ -96,19 +65,16 @@ function Books() {
   useEffect(() => { fetchBooks(); }, [location, fetchBooks]);
   useEffect(() => { filterBooks(); }, [filterBooks]);
 
-  function onConfirmDelete(confirm: boolean) {
-    if(confirm && deleteDialog.book) {
-      deleteBook(deleteDialog.book);
-    }
-    setDeleteDialog({ open: false, book: null});
-  }
-
   function onAdd() {
     navigate(`/books/new`);
   }
 
   function onEdit(book: Book) {
     navigate(`/books/edit/${book.id}`);
+  }
+
+  function onDelete(book: Book) {
+    navigate(`/books/delete/${book.id}`);
   }
 
   return (
@@ -130,7 +96,7 @@ function Books() {
         <Grid item xs={12} md={10}>
           <List
             books={filteredBooks}
-            onDelete={(book) => setDeleteDialog({ open: true, book })}
+            onDelete={(book) => onDelete(book)}
             onEdit={(book) => onEdit(book)}/>
         </Grid>
         <Fab
@@ -140,12 +106,6 @@ function Books() {
           <Add />
         </Fab>
       </Grid>
-
-      <ConfirmDialog
-        title='Confirm deletion'
-        text={`Do you want remove "${deleteDialog.book?.title}"?`}
-        open={deleteDialog.open}
-        onConfirm={onConfirmDelete} />
 
       <Outlet />
     </>
