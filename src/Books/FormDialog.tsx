@@ -22,6 +22,11 @@ function FormDialog() {
   const [ open, setOpen ] = useState(false);
   const navigate = useNavigate();
 
+  const onClose = useCallback(() => {
+    setOpen(false);
+    navigate('/books');
+  }, [navigate]);
+
   const fetchBook = useCallback((id: string|undefined) => {
     (async () => {
       try {
@@ -37,7 +42,7 @@ function FormDialog() {
           const data = await response.json();
           reset(data);
         } else {
-          throw new Error(`Couldn't fetch the book with the "id:${id}"`);
+          throw new Error(`Couldn't fetch the book with the id "${id}"`);
         }
       } catch(error) {
         setFetchError(convertToFetchError(error));
@@ -74,7 +79,7 @@ function FormDialog() {
         setFetchError(convertToFetchError(error));
       }
     })();
-  }, []);
+  }, [onClose]);
 
   const addBook = useCallback((book:InputBook) => {
     (async () => {
@@ -99,7 +104,7 @@ function FormDialog() {
         setFetchError(convertToFetchError(error));
       }
     })();
-  }, []);
+  }, [onClose]);
 
   useEffect(() => {
     if(id) {
@@ -108,11 +113,6 @@ function FormDialog() {
       setOpen(true);
     }
   }, [id, fetchBook]);
-
-  function onClose() {
-    setOpen(false);
-    navigate('/books');
-  }
 
   function onSave(book: InputBook) {
     if('id' in book) {
